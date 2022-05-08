@@ -1,8 +1,6 @@
 #include "patientfilewindow.h"
 #include "ui_patientfilewindow.h"
 
-
-
 PatientFileWindow::PatientFileWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::PatientFileWindow)
@@ -24,7 +22,30 @@ PatientFileWindow::PatientFileWindow(QWidget *parent)
 
 PatientFileWindow::~PatientFileWindow()
 {
+    QFile save_table("D:/QTprojects/patient-file/table.csv");
+    if(save_table.open(QIODevice::WriteOnly)){
+        QTextStream st(&save_table);
+    for(int k=0; k< ui->table_patient->rowCount(); k++)
+    {
+       for(int q = 0; q< ui->table_patient->columnCount(); q++)
+       {
+           if(ui->table_patient->item(k,q)->text()!="")
+            st << ui->table_patient->item(k,q)->text() << ';';
+       }
+       if(ui->table_patient->item(k,0)->text()!="")
+        st << '\n';
+    }
+    save_table.close();
+    }
+    else qDebug()<<"Ошибка открытия файла для записи.";
     delete ui;
+}
+
+void PatientFileWindow::clear()
+{
+    ui->name->clear();
+    ui->surname->clear();
+    ui->patronymic->clear();
 }
 
 
@@ -51,9 +72,7 @@ void PatientFileWindow::on_add_note_clicked()
         msg.setText("Внимание!\nВы не заполнили все поля. Добавление невозможно.");
         msg.exec();
 }
-    ui->name->clear();
-    ui->surname->clear();
-    ui->patronymic->clear();
+    clear();
 }
 
 
@@ -72,9 +91,7 @@ void PatientFileWindow::on_change_note_clicked()
                 str=ui->patronymic->text();
             itm=  new QTableWidgetItem(str);
             ui->table_patient->setItem(row,i,itm);}
-        ui->name->clear();
-        ui->surname->clear();
-        ui->patronymic->clear();
+        clear();
     }
 }
 
@@ -101,24 +118,23 @@ void PatientFileWindow::on_delete_note_clicked()
             {
                 itm=  new QTableWidgetItem(str);
                 ui->table_patient->setItem(row,i,itm);}
-            ui->name->clear();
-            ui->surname->clear();
-            ui->patronymic->clear();
-            displacement(row);
+            clear();
+            for(int q=row, row_count = ui->table_patient->rowCount()-1;q<row_count;++q){
+            for(int i=0;i<ui->table_patient->columnCount();i++)
+            {
+                str=ui->table_patient->item(q+1,i)->text();
+                itm=  new QTableWidgetItem(str);
+                ui->table_patient->setItem(q,i,itm);
+            }
+            }
+            if (j>0) j--;
+            else j=0;
         }
     }
 }
 
-void PatientFileWindow::displacement(int row)
+void PatientFileWindow::on_upload_clicked()
 {
-    QString str;
-    for(int q=row;q<ui->table_patient->rowCount()-1;q++){
-    for(int i=0;i<ui->table_patient->columnCount();i++)
-    {
-        str=ui->table_patient->item(q+1,i)->text();
-        itm=  new QTableWidgetItem(str);
-        ui->table_patient->setItem(q,i,itm);
-    }
-    }
-    j--;
+
 }
+

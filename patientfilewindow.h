@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QStringList>//для добавление названия столбцам
 #include <QDebug>
+#include <QFile>
 #include "dialog.h"
 
 QT_BEGIN_NAMESPACE
@@ -20,7 +21,7 @@ public:
     PatientFileWindow(QWidget *parent = nullptr);
     ~PatientFileWindow();
     Dialog dia;
-    void displacement(int row);
+    void clear();
 
 private slots:
     void on_add_note_clicked();
@@ -30,6 +31,7 @@ private slots:
     void on_table_patient_cellClicked(int row);
 
     void on_delete_note_clicked();
+
 
 private:
     Ui::PatientFileWindow *ui;

@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>300</width>
+    <height>200</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Удаление</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0">

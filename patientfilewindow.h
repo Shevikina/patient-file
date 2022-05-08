@@ -7,6 +7,8 @@
 #include <QStringList>//для добавление названия столбцам
 #include <QDebug>
 #include <QFile>
+#include <QTextStream>
+#include <QStandardItem>
 #include "dialog.h"
 
 QT_BEGIN_NAMESPACE
@@ -22,6 +24,7 @@ public:
     ~PatientFileWindow();
     Dialog dia;
     void clear();
+    QStandardItemModel *csvModel;
 
 private slots:
     void on_add_note_clicked();
@@ -32,6 +35,7 @@ private slots:
 
     void on_delete_note_clicked();
 
+    void on_upload_clicked();
 
 private:
     Ui::PatientFileWindow *ui;

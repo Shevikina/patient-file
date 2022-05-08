@@ -135,6 +135,23 @@ void PatientFileWindow::on_delete_note_clicked()
 
 void PatientFileWindow::on_upload_clicked()
 {
-
+    QFile upload_table("D:/QTprojects/patient-file/table.csv");
+    if(upload_table.open(QIODevice::ReadOnly)){
+        QTextStream ut(&upload_table);
+        int c=0;//итератор по строкам
+        while(!ut.atEnd()){
+            QString line = ut.readLine();//считываем построчно
+            int l=0;//итератор по столбцам
+            for (QString item : line.split(";")){
+                  itm=new QTableWidgetItem(item.at(l));
+                  ui->table_patient->setItem(c,l,itm);
+                  l++;
+        }
+            c++;
+            j=c;
+        }
+    upload_table.close();
+    }
+    else qDebug()<<"Ошибка открытия файла для чтения.";
 }
 

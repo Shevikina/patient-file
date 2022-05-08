@@ -113,6 +113,13 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QPushButton" name="upload">
+              <property name="text">
+               <string>Загрузить</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>

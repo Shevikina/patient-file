@@ -1,11 +1,11 @@
-#include "patientfile.h"
+#include "patientfilewindow.h"
 
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    PatientFile w;
+    PatientFileWindow w;
     w.show();
     return a.exec();
 }

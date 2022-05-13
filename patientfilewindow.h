@@ -25,6 +25,8 @@ public:
     Dialog dia;
     void clear();
     QStandardItemModel *csvModel;
+    QTableWidgetItem* createItem(QString text);
+    void nullMessage();
 
 private slots:
     void on_add_note_clicked();
@@ -35,7 +37,6 @@ private slots:
 
     void on_delete_note_clicked();
 
-    void on_upload_clicked();
 
 private:
     Ui::PatientFileWindow *ui;

@@ -97,6 +97,9 @@
               <property name="text">
                <string>Добавить</string>
               </property>
+              <property name="shortcut">
+               <string>Return</string>
+              </property>
              </widget>
             </item>
             <item>
@@ -111,12 +114,8 @@
               <property name="text">
                <string>Удалить</string>
               </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="upload">
-              <property name="text">
-               <string>Загрузить</string>
+              <property name="shortcut">
+               <string>Del</string>
               </property>
              </widget>
             </item>

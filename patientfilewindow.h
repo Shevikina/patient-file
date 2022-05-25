@@ -9,7 +9,12 @@
 #include <QFile>
 #include <QTextStream>
 #include <QStandardItem>
+#include <QtSql>
 #include "dialog.h"
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QSqlTableModel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -30,6 +35,7 @@ class PatientFileWindow : public QMainWindow {
         void getNullMessage();
         bool isSemicolon();
 
+
     private slots:
         void on_add_note_clicked();
 
@@ -39,10 +45,11 @@ class PatientFileWindow : public QMainWindow {
 
         void on_delete_note_clicked();
 
-
-    private:
+private:
         Ui::PatientFileWindow *ui;
         QTableWidgetItem *itm;
+        QSqlDatabase patient_bd;
+        QSqlTableModel *model;
 
 };
 #endif // PATIENTFILE_H

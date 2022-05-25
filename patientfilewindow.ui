@@ -18,6 +18,9 @@
     <item row="0" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
+       <widget class="QTableView" name="table_patient_db"/>
+      </item>
+      <item>
        <widget class="QTableWidget" name="table_patient">
         <property name="minimumSize">
          <size>

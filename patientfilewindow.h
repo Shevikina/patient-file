@@ -41,9 +41,11 @@ class PatientFileWindow : public QMainWindow {
 
         void on_change_note_clicked();
 
-        void on_table_patient_cellClicked(int row);
+//        void on_table_patient_cellClicked(int row);
 
         void on_delete_note_clicked();
+
+        void on_table_patient_db_clicked(const QModelIndex &index);
 
 private:
         Ui::PatientFileWindow *ui;

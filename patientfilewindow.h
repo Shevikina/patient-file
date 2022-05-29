@@ -34,6 +34,7 @@ class PatientFileWindow : public QMainWindow {
         QTableWidgetItem *createItem(QString text);
         void getNullMessage();
         bool isSemicolon();
+        QString getLastRowFile();
 
 
     private slots:
@@ -52,6 +53,8 @@ class PatientFileWindow : public QMainWindow {
         void on_save_table_clicked();
 
         void on_download_filter_clicked();
+
+        void on_download_save_table_clicked();
 
 private:
         Ui::PatientFileWindow *ui;

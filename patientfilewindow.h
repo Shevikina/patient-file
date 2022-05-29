@@ -29,7 +29,7 @@ class PatientFileWindow : public QMainWindow {
         PatientFileWindow(QWidget *parent = nullptr);
         ~PatientFileWindow();
         Dialog dia;
-        void clear();
+        void clearInputFields();
         QStandardItemModel *csvModel;
         QTableWidgetItem *createItem(QString text);
         void getNullMessage();
@@ -41,11 +41,17 @@ class PatientFileWindow : public QMainWindow {
 
         void on_change_note_clicked();
 
-//        void on_table_patient_cellClicked(int row);
-
         void on_delete_note_clicked();
 
         void on_table_patient_db_clicked(const QModelIndex &index);
+
+        void on_filter_notes_clicked();
+
+        void on_reset_filter_notes_clicked();
+
+        void on_save_table_clicked();
+
+        void on_download_filter_clicked();
 
 private:
         Ui::PatientFileWindow *ui;

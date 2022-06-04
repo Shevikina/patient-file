@@ -31,3 +31,6 @@ DISTFILES += \
     .astylerc \
     .astylerc \
     table.csv.txt
+
+RESOURCES += \
+    image.qrc

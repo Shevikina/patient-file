@@ -15,6 +15,12 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlTableModel>
+#include <QObject>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QCheckBox>
+#include <QFileDialog>
+#include <QSettings>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -34,7 +40,7 @@ class PatientFileWindow : public QMainWindow {
         QTableWidgetItem *createItem(QString text);
         void getNullMessage();
         bool isSemicolon();
-        QString getLastRowFile();
+        bool isOverlapTable(QString line);
 
 
     private slots:
@@ -46,17 +52,17 @@ class PatientFileWindow : public QMainWindow {
 
         void on_table_patient_db_clicked(const QModelIndex &index);
 
-        void on_filter_notes_clicked();
+        void on_export_cvs_triggered();
 
-        void on_reset_filter_notes_clicked();
+        void blockedButton_textChanget();
 
-        void on_save_table_clicked();
+        void on_import_cvs_triggered();
 
-        void on_download_filter_clicked();
+        void filter_notes_textChanget();
 
-        void on_download_save_table_clicked();
+        void on_reset_filter_note_clicked();
 
-private:
+    private:
         Ui::PatientFileWindow *ui;
         QTableWidgetItem *itm;
         QSqlDatabase patient_bd;

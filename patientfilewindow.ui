@@ -55,16 +55,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="filter_notes">
+           <widget class="QPushButton" name="reset_filter_note">
             <property name="text">
-             <string>Отфильтровать</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="reset_filter_notes">
-            <property name="text">
-             <string>Сброс фильтра</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -82,27 +75,6 @@
         </property>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout">
-          <item>
-           <widget class="QPushButton" name="save_table">
-            <property name="text">
-             <string>Сохранить таблицу</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="download_filter">
-            <property name="text">
-             <string>Загрузить сохраненный фильтр</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="download_save_table">
-            <property name="text">
-             <string>Загрузить сохраненную таблицу</string>
-            </property>
-           </widget>
-          </item>
           <item>
            <spacer name="verticalSpacer_3">
             <property name="orientation">
@@ -212,6 +184,34 @@
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>827</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Файл</string>
+    </property>
+    <addaction name="export_cvs"/>
+    <addaction name="import_cvs"/>
+   </widget>
+   <addaction name="menu"/>
+  </widget>
+  <action name="export_cvs">
+   <property name="text">
+    <string>Экспорт в cvs</string>
+   </property>
+  </action>
+  <action name="import_cvs">
+   <property name="text">
+    <string>Импорт из cvs</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

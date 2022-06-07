@@ -16,6 +16,9 @@ PatientFileWindow::PatientFileWindow(QWidget *parent)
                                  "surname TEXT,"
                                  "name TEXT,"
                                  "patronymic TEXT)");
+        QSqlQuery query("PRAGMA case_sensitive_like=OFF");
+        //sqlite3_create_function(&patient_bd, "qupper", 1, SQLITE_UTF8, NULL, &PatientFileWindow::qUpper, NULL, NULL);
+
         model = new QSqlTableModel(this, patient_bd);
         model->setTable("patient");
         model->select();
@@ -29,11 +32,11 @@ PatientFileWindow::PatientFileWindow(QWidget *parent)
         ui->horizontalLayout->setStretchFactor(ui->verticalLayout_3, 1);
         ui->table_patient_db->setSelectionBehavior(QAbstractItemView::SelectRows);
         ui->table_patient_db->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
         ui->add_note->setEnabled(false);
         ui->change_note->setEnabled(false);
         ui->delete_note->setEnabled(false);
-        ui->reset_filter_note->setEnabled(false);
-        ui->reset_filter_note->setIcon(QIcon(":/cancel_icon.png"));
+
         QObject::connect(ui->name, &QLineEdit::textChanged, this, &PatientFileWindow::blockedButton_textChanget);
         QObject::connect(ui->surname, &QLineEdit::textChanged, this, &PatientFileWindow::blockedButton_textChanget);
         QObject::connect(ui->patronymic, &QLineEdit::textChanged, this, &PatientFileWindow::blockedButton_textChanget);
@@ -42,20 +45,74 @@ PatientFileWindow::PatientFileWindow(QWidget *parent)
         QObject::connect(ui->patronymic_for_filter, &QLineEdit::textChanged, this,
                          &PatientFileWindow::filter_notes_textChanget);
 
+        QAction *clear_button_1 = ui->surname_for_filter->addAction(QIcon(":/cancel_icon.png"), QLineEdit::TrailingPosition);
+        QAction *clear_button_2 = ui->name_for_filter->addAction(QIcon(":/cancel_icon.png"), QLineEdit::TrailingPosition);
+        QAction *clear_button_3 = ui->patronymic_for_filter->addAction(QIcon(":/cancel_icon.png"), QLineEdit::TrailingPosition);
+        QObject::connect(clear_button_1, &QAction::triggered, this, &PatientFileWindow::reset_filter_notes_triggered);
+        QObject::connect(clear_button_2, &QAction::triggered, this, &PatientFileWindow::reset_filter_notes_triggered);
+        QObject::connect(clear_button_3, &QAction::triggered, this, &PatientFileWindow::reset_filter_notes_triggered);
+
+        //        ui->name_for_filter->setClearButtonEnabled(true);
+        //        ui->surname_for_filter->setClearButtonEnabled(true);
+        //        ui->patronymic_for_filter->setClearButtonEnabled(true);
+
     }
 }
+
+//не работает метод sqlite3_create_function
+void PatientFileWindow::qUpper(sqlite3_context *context, int argc, sqlite3_value **argv) {
+    QByteArray ba = QString::fromUtf8((const char *)sqlite3_value_text(argv[0])).toUpper().toUtf8();
+    sqlite3_result_text(context, ba.constData(), ba.size(), NULL);
+}
+
+bool PatientFileWindow::isSpace() {
+    bool is_space = false;
+    QString name = ui->name->text();
+    QString surname = ui->surname->text();
+    QString patronymic = ui->patronymic->text();
+    QMessageBox msg;
+    msg.setWindowTitle("Недопустимый символ");
+    msg.setText("Внимание! "
+                "\nСимвол пробела недопустим в данных полях!\""
+                "\nДобавление, изменение или сохраннение поля невозможно.");
+    if (name != "" && surname != "" && patronymic != "") {
+        if (name.contains(" ") || surname.contains(" ") || patronymic.contains(" ")) {
+            is_space = true;
+            msg.exec();
+        }
+    }
+    return is_space;
+}
+
+bool PatientFileWindow::isSpaceInFilter() {
+    bool is_space = false;
+    QString name_filter = ui->name_for_filter->text();
+    QString surname_filter = ui->surname_for_filter->text();
+    QString patronymic_filter = ui->patronymic_for_filter->text();
+    if (name_filter != "" || surname_filter != "" || patronymic_filter != "")
+        if (name_filter.contains(" ") || surname_filter.contains(" ") || patronymic_filter.contains(" ")) {
+            is_space = true;
+        }
+    return is_space;
+}
+
+//static void qLower(sqlite3_context *context, int argc, sqlite3_value **argv)
+//{
+//    QByteArray ba = QString::fromUtf8((const char *)sqlite3_value_text(argv[0])).toLower().toUtf8();
+//    sqlite3_result_text(context, ba.constData(), ba.size(), NULL);
+//}
 
 
 PatientFileWindow::~PatientFileWindow() {
     delete ui;
 }
 
-
 void PatientFileWindow::clearInputFields() {
     ui->name->clear();
     ui->surname->clear();
     ui->patronymic->clear();
 }
+
 
 bool PatientFileWindow::isSemicolon() {
     bool is_semicolon = false;
@@ -92,7 +149,7 @@ bool PatientFileWindow::isSemicolon() {
 
 
 void PatientFileWindow::on_add_note_clicked() {
-    if (!isSemicolon()) {
+    if (!isSemicolon() && !isSpace()) {
         int last_row_db = model->rowCount();
         model->insertRow(last_row_db);
         QString str = "";
@@ -113,7 +170,7 @@ void PatientFileWindow::on_add_note_clicked() {
 
 
 void PatientFileWindow::on_change_note_clicked() {
-    if (!isSemicolon()) {
+    if (!isSemicolon() && !isSpace()) {
         int row_db = ui->table_patient_db->currentIndex().row();
         qDebug() << row_db;
         QString str = "";
@@ -147,15 +204,23 @@ void PatientFileWindow::blockedButton_textChanget() {
     QString name = ui->name->text();
     QString surname = ui->surname->text();
     QString patronymic = ui->patronymic->text();
-    if (name == "" || surname == "" || patronymic == "") {
-        ui->add_note->setEnabled(false);
-        ui->change_note->setEnabled(false);
-        ui->delete_note->setEnabled(false);
+    if (model->data(model->index(0, 0)).isNull()) {
+        if (name == "" || surname == "" || patronymic == "")
+            ui->add_note->setEnabled(false);
+        else
+            ui->add_note->setEnabled(true);
     }
     else {
-        ui->add_note->setEnabled(true);
-        ui->change_note->setEnabled(true);
-        ui->delete_note->setEnabled(true);
+        if (name == "" || surname == "" || patronymic == "") {
+            ui->add_note->setEnabled(false);
+            ui->change_note->setEnabled(false);
+            ui->delete_note->setEnabled(false);
+        }
+        else {
+            ui->add_note->setEnabled(true);
+            ui->change_note->setEnabled(true);
+            ui->delete_note->setEnabled(true);
+        }
     }
 }
 
@@ -303,12 +368,31 @@ void PatientFileWindow::on_import_cvs_triggered() {
 }
 
 void PatientFileWindow::filter_notes_textChanget() {
-    if (!isSemicolon()) {
+    if (isSpaceInFilter()) {
+        if (ui->surname_for_filter->hasFocus()) {
+            QString surname_text = ui->surname_for_filter->text();
+            surname_text = surname_text.remove(" ");
+            ui->surname_for_filter->setText(surname_text);
+            ui->name_for_filter->setFocus();
+        }
+        else if (ui->name_for_filter->hasFocus()) {
+            QString name_text = ui->name_for_filter->text();
+            name_text = name_text.remove(" ");
+            ui->name_for_filter->setText(name_text);
+            ui->patronymic_for_filter->setFocus();
+        }
+        else {
+            QString patronymic_text = ui->patronymic_for_filter->text();
+            patronymic_text = patronymic_text.remove(" ");
+            ui->patronymic_for_filter->setText(patronymic_text);
+            ui->surname_for_filter->setFocus();
+        }
+    }
+    else if (!isSemicolon() && !isSpaceInFilter()) {
         QString name = ui->name_for_filter->text();
         QString surname = ui->surname_for_filter->text();
         QString patronymic = ui->patronymic_for_filter->text();
         if (name != "" || surname != "" || patronymic != "") {
-            ui->reset_filter_note->setEnabled(true);
             if (name != "" && surname != "" && patronymic != "")
                 model->setFilter(QString("name LIKE '%1%' AND surname LIKE '%2%' AND patronymic LIKE '%3%'").arg(name).arg(surname).arg(
                                      patronymic));
@@ -327,12 +411,11 @@ void PatientFileWindow::filter_notes_textChanget() {
         }
         else {
             model->setFilter(QString());
-            ui->reset_filter_note->setEnabled(false);
         }
     }
 }
 
-void PatientFileWindow::on_reset_filter_note_clicked() {
+void PatientFileWindow::reset_filter_notes_triggered() {
     model->setFilter(QString());
     ui->name_for_filter->clear();
     ui->surname_for_filter->clear();

@@ -22,6 +22,13 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Поиск:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QLineEdit" name="surname_for_filter">
             <property name="inputMask">
              <string/>
@@ -51,13 +58,6 @@
             </property>
             <property name="placeholderText">
              <string>Отчество</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="reset_filter_note">
-            <property name="text">
-             <string/>
             </property>
            </widget>
           </item>
@@ -204,12 +204,12 @@
   </widget>
   <action name="export_cvs">
    <property name="text">
-    <string>Экспорт в cvs</string>
+    <string>Экспорт в cvs...</string>
    </property>
   </action>
   <action name="import_cvs">
    <property name="text">
-    <string>Импорт из cvs</string>
+    <string>Импорт из cvs...</string>
    </property>
   </action>
  </widget>

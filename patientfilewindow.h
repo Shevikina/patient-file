@@ -21,6 +21,7 @@
 #include <QCheckBox>
 #include <QFileDialog>
 #include <QSettings>
+#include "sqlite3.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -41,6 +42,9 @@ class PatientFileWindow : public QMainWindow {
         void getNullMessage();
         bool isSemicolon();
         bool isOverlapTable(QString line);
+        void qUpper(sqlite3_context *context, int argc, sqlite3_value **argv);
+        bool isSpace();
+        bool isSpaceInFilter();
 
 
     private slots:
@@ -60,7 +64,7 @@ class PatientFileWindow : public QMainWindow {
 
         void filter_notes_textChanget();
 
-        void on_reset_filter_note_clicked();
+        void reset_filter_notes_triggered();
 
     private:
         Ui::PatientFileWindow *ui;

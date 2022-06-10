@@ -1,6 +1,7 @@
 #include "patientfilewindow.h"
 #include "ui_patientfilewindow.h"
 
+
 PatientFileWindow::PatientFileWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::PatientFileWindow) {
@@ -17,7 +18,6 @@ PatientFileWindow::PatientFileWindow(QWidget *parent)
                                  "name TEXT,"
                                  "patronymic TEXT)");
         QSqlQuery query("PRAGMA case_sensitive_like=OFF");
-        //sqlite3_create_function(&patient_bd, "qupper", 1, SQLITE_UTF8, NULL, &PatientFileWindow::qUpper, NULL, NULL);
 
         model = new QSqlTableModel(this, patient_bd);
         model->setTable("patient");
@@ -45,62 +45,15 @@ PatientFileWindow::PatientFileWindow(QWidget *parent)
         QObject::connect(ui->patronymic_for_filter, &QLineEdit::textChanged, this,
                          &PatientFileWindow::filter_notes_textChanget);
 
-        QAction *clear_button_1 = ui->surname_for_filter->addAction(QIcon(":/cancel_icon.png"), QLineEdit::TrailingPosition);
-        QAction *clear_button_2 = ui->name_for_filter->addAction(QIcon(":/cancel_icon.png"), QLineEdit::TrailingPosition);
-        QAction *clear_button_3 = ui->patronymic_for_filter->addAction(QIcon(":/cancel_icon.png"), QLineEdit::TrailingPosition);
-        QObject::connect(clear_button_1, &QAction::triggered, this, &PatientFileWindow::reset_filter_notes_triggered);
-        QObject::connect(clear_button_2, &QAction::triggered, this, &PatientFileWindow::reset_filter_notes_triggered);
-        QObject::connect(clear_button_3, &QAction::triggered, this, &PatientFileWindow::reset_filter_notes_triggered);
+        ui->reset_button->setIcon(QIcon(":/cancel_icon.png"));
+        QObject::connect(ui->reset_button, &QPushButton::clicked, this, &PatientFileWindow::reset_filter_notes_triggered);
 
-        //        ui->name_for_filter->setClearButtonEnabled(true);
-        //        ui->surname_for_filter->setClearButtonEnabled(true);
-        //        ui->patronymic_for_filter->setClearButtonEnabled(true);
+        ui->name_for_filter->setClearButtonEnabled(true);
+        ui->surname_for_filter->setClearButtonEnabled(true);
+        ui->patronymic_for_filter->setClearButtonEnabled(true);
 
     }
 }
-
-//не работает метод sqlite3_create_function
-void PatientFileWindow::qUpper(sqlite3_context *context, int argc, sqlite3_value **argv) {
-    QByteArray ba = QString::fromUtf8((const char *)sqlite3_value_text(argv[0])).toUpper().toUtf8();
-    sqlite3_result_text(context, ba.constData(), ba.size(), NULL);
-}
-
-bool PatientFileWindow::isSpace() {
-    bool is_space = false;
-    QString name = ui->name->text();
-    QString surname = ui->surname->text();
-    QString patronymic = ui->patronymic->text();
-    QMessageBox msg;
-    msg.setWindowTitle("Недопустимый символ");
-    msg.setText("Внимание! "
-                "\nСимвол пробела недопустим в данных полях!\""
-                "\nДобавление, изменение или сохраннение поля невозможно.");
-    if (name != "" && surname != "" && patronymic != "") {
-        if (name.contains(" ") || surname.contains(" ") || patronymic.contains(" ")) {
-            is_space = true;
-            msg.exec();
-        }
-    }
-    return is_space;
-}
-
-bool PatientFileWindow::isSpaceInFilter() {
-    bool is_space = false;
-    QString name_filter = ui->name_for_filter->text();
-    QString surname_filter = ui->surname_for_filter->text();
-    QString patronymic_filter = ui->patronymic_for_filter->text();
-    if (name_filter != "" || surname_filter != "" || patronymic_filter != "")
-        if (name_filter.contains(" ") || surname_filter.contains(" ") || patronymic_filter.contains(" ")) {
-            is_space = true;
-        }
-    return is_space;
-}
-
-//static void qLower(sqlite3_context *context, int argc, sqlite3_value **argv)
-//{
-//    QByteArray ba = QString::fromUtf8((const char *)sqlite3_value_text(argv[0])).toLower().toUtf8();
-//    sqlite3_result_text(context, ba.constData(), ba.size(), NULL);
-//}
 
 
 PatientFileWindow::~PatientFileWindow() {
@@ -149,7 +102,7 @@ bool PatientFileWindow::isSemicolon() {
 
 
 void PatientFileWindow::on_add_note_clicked() {
-    if (!isSemicolon() && !isSpace()) {
+    if (!isSemicolon()) {
         int last_row_db = model->rowCount();
         model->insertRow(last_row_db);
         QString str = "";
@@ -170,7 +123,7 @@ void PatientFileWindow::on_add_note_clicked() {
 
 
 void PatientFileWindow::on_change_note_clicked() {
-    if (!isSemicolon() && !isSpace()) {
+    if (!isSemicolon()) {
         int row_db = ui->table_patient_db->currentIndex().row();
         qDebug() << row_db;
         QString str = "";
@@ -244,27 +197,32 @@ void PatientFileWindow::on_export_cvs_triggered() {
     if (!isSemicolon()) { //добавлена проверка на запрещенные символы на случай, если кнопка фильтр не была нажатаю, а сохранение таблицы произошло
         QFileDialog export_table_dialog;
         QString url_export_table = export_table_dialog.getSaveFileName(0, "", "", "*.csv");
-        QFile save_table(url_export_table);
-        if (save_table.open(QIODevice::WriteOnly)) {
-            QTextStream st(&save_table);
-            bool stop_writing = false;
-            for (int row_iterator = 0; row_iterator < model->rowCount(); row_iterator++) {
-                for (int column_iterator = 0; column_iterator < model->columnCount(); column_iterator++) {
-                    QVariant item = model->data(model->index(row_iterator, column_iterator));
-                    if (item.isNull()) {
-                        stop_writing = true;
-                        break;
+        qDebug() << url_export_table;
+        if (url_export_table != "") {
+            QFile save_table(url_export_table);
+            if (save_table.open(QIODevice::WriteOnly)) {
+                QTextStream st(&save_table);
+                bool stop_writing = false;
+                for (int row_iterator = 0; row_iterator < model->rowCount(); row_iterator++) {
+                    for (int column_iterator = 0; column_iterator < model->columnCount(); column_iterator++) {
+                        QVariant item = model->data(model->index(row_iterator, column_iterator));
+                        if (item.isNull()) {
+                            stop_writing = true;
+                            break;
+                        }
+                        if (item.toString() != "")
+                            st << item.toString() << ';';
                     }
-                    if (item.toString() != "")
-                        st << item.toString() << ';';
+                    if (stop_writing) break;
+                    st << '\n';
                 }
-                if (stop_writing) break;
-                st << '\n';
+                save_table.close();
+                qDebug() << "Запись таблицы прошла успешно";
             }
-            save_table.close();
-            qDebug() << "Запись таблицы прошла успешно";
+            else qDebug() << "Ошибка открытия файла для записи.";
         }
-        else qDebug() << "Ошибка открытия файла для записи.";
+        else
+            qDebug() << "Была нажата копка отмены. Таблица не экспортирована.";
     }
 }
 
@@ -328,15 +286,27 @@ void PatientFileWindow::on_import_cvs_triggered() {
     }
     QFileDialog import_table_dialog;
     QString url_import_file = import_table_dialog.getOpenFileName(0, "", "", "*.csv");
-    qDebug() << url_import_file;
-    QFile import_table(url_import_file);
-    if (import_table.open(QIODevice::ReadOnly)) {
-        QTextStream imt(&import_table);
-        while (!imt.atEnd())  {
-            QString line = imt.readLine();
-            int last_row = model->rowCount();
-            if (msg_exec == 0) {
-                if (isOverlapTable(line)) {
+    if (url_import_file != "") {
+        qDebug() << url_import_file;
+        QFile import_table(url_import_file);
+        if (import_table.open(QIODevice::ReadOnly)) {
+            QTextStream imt(&import_table);
+            while (!imt.atEnd())  {
+                QString line = imt.readLine();
+                int last_row = model->rowCount();
+                if (msg_exec == 0) {
+                    if (isOverlapTable(line)) {
+                        model->insertRow(last_row);
+                        for (int column_iterator = 0; column_iterator < model->columnCount();) {
+                            for (QString item : line.split(";")) {
+                                if (column_iterator != 0)
+                                    model->setData(model->index(last_row, column_iterator), item);
+                                column_iterator++;
+                            }
+                        }
+                    }
+                }
+                else {
                     model->insertRow(last_row);
                     for (int column_iterator = 0; column_iterator < model->columnCount();) {
                         for (QString item : line.split(";")) {
@@ -346,49 +316,19 @@ void PatientFileWindow::on_import_cvs_triggered() {
                         }
                     }
                 }
+                import_table.close();
             }
-            else {
-                model->insertRow(last_row);
-                for (int column_iterator = 0; column_iterator < model->columnCount();) {
-                    for (QString item : line.split(";")) {
-                        if (column_iterator != 0)
-                            model->setData(model->index(last_row, column_iterator), item);
-                        column_iterator++;
-                    }
-                }
-            }
-            import_table.close();
+            if (!model->submitAll())
+                qDebug() << "Ошибка ввода записей";
         }
-        if (!model->submitAll())
-            qDebug() << "Ошибка ввода записей";
-    }
-    else {
-        qDebug() << "Ошибка открытия файла";
+        else {
+            qDebug() << "Ошибка открытия файла";
+        }
     }
 }
 
 void PatientFileWindow::filter_notes_textChanget() {
-    if (isSpaceInFilter()) {
-        if (ui->surname_for_filter->hasFocus()) {
-            QString surname_text = ui->surname_for_filter->text();
-            surname_text = surname_text.remove(" ");
-            ui->surname_for_filter->setText(surname_text);
-            ui->name_for_filter->setFocus();
-        }
-        else if (ui->name_for_filter->hasFocus()) {
-            QString name_text = ui->name_for_filter->text();
-            name_text = name_text.remove(" ");
-            ui->name_for_filter->setText(name_text);
-            ui->patronymic_for_filter->setFocus();
-        }
-        else {
-            QString patronymic_text = ui->patronymic_for_filter->text();
-            patronymic_text = patronymic_text.remove(" ");
-            ui->patronymic_for_filter->setText(patronymic_text);
-            ui->surname_for_filter->setFocus();
-        }
-    }
-    else if (!isSemicolon() && !isSpaceInFilter()) {
+    if (!isSemicolon()) {
         QString name = ui->name_for_filter->text();
         QString surname = ui->surname_for_filter->text();
         QString patronymic = ui->patronymic_for_filter->text();

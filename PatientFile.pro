@@ -12,13 +12,11 @@ CONFIG += c++11
 SOURCES += \
     dialog.cpp \
     main.cpp \
-    patientfilewindow.cpp \
-    sqlite3.c
+    patientfilewindow.cpp
 
 HEADERS += \
     dialog.h \
-    patientfilewindow.h \
-    sqlite3.h
+    patientfilewindow.h
 
 FORMS += \
     dialog.ui \
